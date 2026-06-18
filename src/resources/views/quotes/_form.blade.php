@@ -1,0 +1,45 @@
+@csrf
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body p-4">
+        <div class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label">Client <span class="text-danger">*</span></label>
+                <select name="client_id" class="form-select @error('client_id') is-invalid @enderror" required>
+                    <option value="">— Sélectionner —</option>
+                    @foreach($clients as $c)
+                        <option value="{{ $c->id }}" @selected(old('client_id', $quote->client_id) == $c->id)>{{ $c->name }}</option>
+                    @endforeach
+                </select>
+                @error('client_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+            <div class="col-md-7">
+                <label class="form-label">Objet</label>
+                <input type="text" name="title" value="{{ old('title', $quote->title) }}" class="form-control" placeholder="Ex : Rénovation salle de bain">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Date d'émission <span class="text-danger">*</span></label>
+                <input type="date" name="issue_date" value="{{ old('issue_date', optional($quote->issue_date)->format('Y-m-d')) }}" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Valable jusqu'au</label>
+                <input type="date" name="valid_until" value="{{ old('valid_until', optional($quote->valid_until)->format('Y-m-d')) }}"
+                       class="form-control @error('valid_until') is-invalid @enderror">
+                @error('valid_until')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body p-4">
+        <h2 class="h6 fw-bold mb-3">Prestations</h2>
+        @include('partials.line-items', ['document' => $quote, 'catalog' => $catalog ?? collect()])
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body p-4">
+        <label class="form-label">Notes / conditions</label>
+        <textarea name="notes" rows="2" class="form-control">{{ old('notes', $quote->notes) }}</textarea>
+    </div>
+</div>

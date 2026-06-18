@@ -1,0 +1,141 @@
+@extends('layouts.app')
+@section('title', 'Paramètres')
+
+@section('content')
+    <h1 class="h3 fw-bold mb-4"><i class="bi bi-gear-fill text-secondary me-2"></i>Paramètres</h1>
+
+    <div class="row g-4">
+        {{-- Entreprise --}}
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h6 text-uppercase text-muted mb-3">Mon entreprise</h2>
+
+                    @error('name')<div class="alert alert-danger py-2">{{ $message }}</div>@enderror
+
+                    <form method="POST" action="{{ route('settings.company.update') }}">
+                        @csrf
+                        @method('PUT')
+                        <fieldset @disabled(!$user->isAdmin())>
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Nom</label>
+                                <input type="text" name="name" value="{{ old('name', $company->name) }}" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">SIRET</label>
+                                <input type="text" name="siret" value="{{ old('siret', $company->siret) }}" maxlength="14" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Adresse</label>
+                                <input type="text" name="address" value="{{ old('address', $company->address) }}" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Code postal</label>
+                                <input type="text" name="zip" value="{{ old('zip', $company->zip) }}" maxlength="10" class="form-control">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Ville</label>
+                                <input type="text" name="city" value="{{ old('city', $company->city) }}" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Téléphone</label>
+                                <input type="text" name="phone" value="{{ old('phone', $company->phone) }}" class="form-control">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">E-mail</label>
+                                <input type="email" name="email" value="{{ old('email', $company->email) }}" class="form-control">
+                            </div>
+                        </div>
+                        @if($user->isAdmin())
+                            <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-check-lg me-1"></i>Enregistrer</button>
+                        @else
+                            <p class="text-muted small mt-3 mb-0"><i class="bi bi-lock me-1"></i>Seul un administrateur peut modifier ces informations.</p>
+                        @endif
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Sécurité --}}
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h6 text-uppercase text-muted mb-3">Sécurité</h2>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-semibold">Double authentification</div>
+                            <div class="small text-muted">Protégez votre compte avec un code TOTP.</div>
+                        </div>
+                        @if($user->hasTwoFactorEnabled())
+                            <span class="badge text-bg-success">Activée</span>
+                        @else
+                            <span class="badge text-bg-secondary">Inactive</span>
+                        @endif
+                    </div>
+                    <div class="mt-3">
+                        @if($user->hasTwoFactorEnabled())
+                            <form method="POST" action="{{ route('two-factor.destroy') }}"
+                                  onsubmit="return confirm('Désactiver la double authentification ?');">
+                                @csrf @method('DELETE')
+                                <button class="btn btn-outline-danger btn-sm"><i class="bi bi-shield-slash me-1"></i>Désactiver</button>
+                            </form>
+                        @else
+                            <a href="{{ route('two-factor.show') }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-shield-check me-1"></i>Activer la 2FA</a>
+                        @endif
+                    </div>
+
+                    <hr>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-semibold">Mot de passe</div>
+                            <div class="small text-muted">Recevez un lien sécurisé par e-mail pour le changer.</div>
+                        </div>
+                        <form method="POST" action="{{ route('settings.password-reset') }}">
+                            @csrf
+                            <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-envelope-lock me-1"></i>Changer par e-mail</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small text-uppercase">Mon compte</span>
+                        <span class="badge text-bg-primary">{{ $user->roleLabel() }}</span>
+                    </div>
+                    <div class="fw-semibold mt-1">{{ $user->name }}</div>
+                    <div class="small text-muted">{{ $user->email }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Journal d'audit --}}
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body p-4">
+            <h2 class="h6 text-uppercase text-muted mb-3">Journal de connexion (audit)</h2>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Utilisateur</th><th>Évènement</th><th>IP</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        @forelse($audits as $audit)
+                            <tr>
+                                <td>{{ $audit->user?->name ?? $audit->email ?? 'Inconnu' }}</td>
+                                <td><span class="badge text-bg-light text-dark">{{ $audit->action }}</span></td>
+                                <td class="text-muted small">{{ $audit->ip_address }}</td>
+                                <td class="text-muted small">{{ $audit->created_at?->format('d/m/Y H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="text-center text-muted py-4">Aucun évènement enregistré.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+@endsection

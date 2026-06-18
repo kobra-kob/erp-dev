@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Force | Select-Object Name, Length, Mode; Write-Output \"---\"; \\(Get-ChildItem -Recurse -File | Measure-Object\\).Count)",
+      "PowerShell(curl.exe -s -o NUL -w \"HTTP %{http_code}`n\" http://localhost:8080/login)",
+      "PowerShell(docker compose exec -T app sh -lc \"curl -s -o /dev/null -w 'interne HTTP %{http_code}\\\\n' http://localhost/login || echo 'curl absent'\")",
+      "Bash(ls \"C:/Users/louis/.claude/projects/C--Users-louis-OneDrive-Documents-01---IPI-CCNA-Projet-file-rouge-APP-ERP/memory/\" 2>/dev/null; echo \"---MEMORY.md---\"; cat \"C:/Users/louis/.claude/projects/C--Users-louis-OneDrive-Documents-01---IPI-CCNA-Projet-file-rouge-APP-ERP/memory/MEMORY.md\" 2>/dev/null || echo \"absent\")",
+      "PowerShell(docker compose exec -T app php artisan tinker --execute=\"echo 'Quotes: '.\\\\App\\\\Models\\\\Quote::withoutGlobalScopes\\(\\)->count\\(\\).PHP_EOL; echo 'Invoices: '.\\\\App\\\\Models\\\\Invoice::withoutGlobalScopes\\(\\)->count\\(\\).PHP_EOL; \\\\$i=\\\\App\\\\Models\\\\Invoice::withoutGlobalScopes\\(\\)->first\\(\\); echo 'Inv '.\\\\$i->number.' TTC='.\\\\$i->total_ttc.' paye='.\\\\$i->paid_amount.' statut='.\\\\$i->status.PHP_EOL; \\\\$q=\\\\App\\\\Models\\\\Quote::withoutGlobalScopes\\(\\)->where\\('status','accepted'\\)->first\\(\\); echo 'Quote '.\\\\$q->number.' TTC='.\\\\$q->total_ttc.' lignes='.\\\\$q->lines\\(\\)->count\\(\\).PHP_EOL;\")",
+      "Bash(docker compose exec -T app sh -c ' *)",
+      "Bash(\"USE artisanflow; SELECT id,name,email,role,is_active FROM users WHERE email=\\\\\"jean.test@example.com\\\\\";\")",
+      "Bash(docker compose *)",
+      "Bash(\"USE artisanflow; SELECT q.number, q.status, \\(SELECT number FROM invoices WHERE quote_id=q.id\\) AS facture FROM quotes q WHERE q.id=2;\")",
+      "Bash(\"USE artisanflow; SELECT id,name,modules FROM roles;\")"
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: artisanflow_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/zz-custom.ini:ro
+      # Dossiers à forte I/O placés sur des volumes Docker natifs (FS Linux rapide)
+      # au lieu du bind-mount Windows/OneDrive → gain de performance majeur.
+      - vendor:/var/www/html/vendor
+      - framework:/var/www/html/storage/framework
+      - bootstrap_cache:/var/www/html/bootstrap/cache
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - artisanflow
+
+  db:
+    image: mariadb:11
+    container_name: artisanflow_db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: artisanflow
+      MARIADB_USER: artisanflow
+      MARIADB_PASSWORD: secret
+      MARIADB_ROOT_PASSWORD: rootsecret
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - artisanflow
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: artisanflow_pma
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - artisanflow
+
+volumes:
+  dbdata:
+  vendor:
+  framework:
+  bootstrap_cache:
+
+networks:
+  artisanflow:
+    driver: bridge

@@ -1,0 +1,27 @@
+# Dépendances (régénérées par composer/npm sur le serveur)
+src/vendor/
+src/node_modules/
+src/public/build/
+src/public/hot
+
+# Secrets et environnement
+src/.env
+src/.env.backup
+src/.env.production
+.env
+
+# Caches & logs Laravel
+src/storage/*.key
+src/storage/logs/*.log
+src/storage/framework/cache/*
+src/storage/framework/sessions/*
+src/storage/framework/views/*
+src/bootstrap/cache/*.php
+*.log
+
+# Outils / IDE / OS
+.idea/
+.vscode/
+.phpunit.result.cache
+.DS_Store
+Thumbs.db
