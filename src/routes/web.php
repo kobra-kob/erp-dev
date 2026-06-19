@@ -108,7 +108,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('module:stock')->group(function () {
-        Route::resource('products', ProductController::class)->except('show');
+        Route::resource('products', ProductController::class);
         Route::patch('products/{product}/adjust', [ProductController::class, 'adjustStock'])->name('products.adjust');
         Route::post('products/replenish-all', [ProductController::class, 'replenishAll'])->name('products.replenish-all');
         Route::post('products/{product}/replenish', [ProductController::class, 'replenish'])->name('products.replenish');
@@ -223,6 +223,7 @@ Route::middleware('auth')->group(function () {
     // Paramètres + sécurité (2FA)
     Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::put('settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+    Route::put('settings/branding', [SettingsController::class, 'updateBranding'])->name('settings.branding.update');
     Route::post('settings/password-reset', [SettingsController::class, 'sendPasswordReset'])->name('settings.password-reset');
 
     Route::get('settings/two-factor', [TwoFactorSettingsController::class, 'show'])->name('two-factor.show');

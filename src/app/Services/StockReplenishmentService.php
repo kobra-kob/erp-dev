@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\PurchaseOrder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 /**
@@ -48,8 +49,14 @@ class StockReplenishmentService
             'ordered_at'     => now()->toDateString(),
         ]);
 
+        // Notification fournisseur « best-effort » : une panne SMTP ne doit pas
+        // annuler le réappro déjà effectué (commande + stock incrémenté).
         if ($product->supplier_email) {
-            Mail::to($product->supplier_email)->send(new SupplierOrderMail($order));
+            try {
+                Mail::to($product->supplier_email)->send(new SupplierOrderMail($order));
+            } catch (\Throwable $e) {
+                Log::warning('Échec e-mail fournisseur (réappro #' . $order->id . ') : ' . $e->getMessage());
+            }
         }
 
         return $order;

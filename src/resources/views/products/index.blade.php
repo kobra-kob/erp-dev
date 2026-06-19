@@ -45,7 +45,19 @@
                 <tbody>
                     @forelse($products as $product)
                         <tr class="{{ $product->isLowStock() ? 'table-warning' : '' }}">
-                            <td class="fw-semibold">{{ $product->name }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if($product->imageUrl())
+                                        <img src="{{ $product->imageUrl() }}" alt="" class="rounded border" style="height:40px;width:40px;object-fit:cover;">
+                                    @else
+                                        <span class="d-inline-flex align-items-center justify-content-center rounded border bg-light text-muted" style="height:40px;width:40px;"><i class="bi bi-box-seam"></i></span>
+                                    @endif
+                                    <div>
+                                        <a href="{{ route('products.show', $product) }}" class="fw-semibold text-decoration-none">{{ $product->name }}</a>
+                                        <div class="text-muted small">{{ $product->category ?: $product->kindLabel() }}@unless($product->is_sellable) · <span class="text-warning">non vendable</span>@endunless</div>
+                                    </div>
+                                </div>
+                            </td>
                             <td class="text-muted">{{ $product->reference ?: '—' }}</td>
                             <td class="text-end">@eur($product->purchase_price)</td>
                             <td class="text-end">@eur($product->sale_price)</td>

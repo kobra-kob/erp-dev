@@ -56,7 +56,10 @@
                         </span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow app-menu">
-                        <li><span class="dropdown-item-text small text-muted">{{ $u->company?->name }}</span></li>
+                        <li><span class="dropdown-item-text small text-muted">
+                            {{ $u->company?->name }}
+                            <span class="d-block text-secondary" style="font-size:.7rem;">ArtisanFlow v{{ config('app.version') }}</span>
+                        </span></li>
                         <li><hr class="dropdown-divider"></li>
 
                         {{-- Applications --}}

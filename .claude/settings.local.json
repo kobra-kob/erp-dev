@@ -10,7 +10,11 @@
       "Bash(\"USE artisanflow; SELECT id,name,email,role,is_active FROM users WHERE email=\\\\\"jean.test@example.com\\\\\";\")",
       "Bash(docker compose *)",
       "Bash(\"USE artisanflow; SELECT q.number, q.status, \\(SELECT number FROM invoices WHERE quote_id=q.id\\) AS facture FROM quotes q WHERE q.id=2;\")",
-      "Bash(\"USE artisanflow; SELECT id,name,modules FROM roles;\")"
+      "Bash(\"USE artisanflow; SELECT id,name,modules FROM roles;\")",
+      "Bash(cd \"/c/Users/louis/OneDrive/Documents/01 - IPI/CCNA/Projet file rouge/APP-ERP/src\" && echo \"=== migrations produits ===\" && ls database/migrations/ | grep -i product && echo \"\" && echo \"=== storage link existe ? ===\" && ls -la public/storage 2>/dev/null || echo \"pas de symlink public/storage\" && echo \"\" && echo \"=== routes products ===\" && grep -n \"product\" routes/web.php)",
+      "Bash(cd \"/c/Users/louis/OneDrive/Documents/01 - IPI/CCNA/Projet file rouge/APP-ERP/src\" && find tests -type f -name '*.php' | head -50)",
+      "Bash(bash -n install.sh)",
+      "Bash(bash -n update.sh)"
     ]
   }
 }

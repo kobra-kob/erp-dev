@@ -1,3 +1,6 @@
+@php($company = $invoice->company)
+@php($logo = $company->logoDataUri())
+@php($cls = ['paid'=>'b-paid','partial'=>'b-partial','unpaid'=>'b-unpaid'][$invoice->status] ?? 'b-unpaid')
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,18 +10,19 @@
         body { font-size: 12px; color: #1f2937; margin: 0; }
         .header { width: 100%; margin-bottom: 30px; }
         .header td { vertical-align: top; }
-        .brand { font-size: 20px; font-weight: bold; color: #059669; }
+        .brand { font-size: 20px; font-weight: bold; color: {{ $company->brandColor() }}; }
+        .logo { max-height: 70px; max-width: 200px; margin-bottom: 6px; }
         .muted { color: #6b7280; }
-        .doc-title { font-size: 26px; font-weight: bold; text-align: right; }
+        .doc-title { font-size: 26px; font-weight: bold; text-align: right; color: {{ $company->brandColor() }}; }
         .doc-meta { text-align: right; }
-        .box { background: #f3f4f6; padding: 10px 12px; border-radius: 6px; }
+        .box { background: #f3f4f6; padding: 10px 12px; border-radius: {{ $company->documentRadius() }}; }
         table.items { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        table.items th { background: #1f2937; color: #fff; padding: 7px 8px; text-align: left; font-size: 11px; }
+        table.items th { background: {{ $company->brandAccent() }}; color: #fff; padding: 7px 8px; text-align: left; font-size: 11px; }
         table.items td { padding: 6px 8px; border-bottom: 1px solid #e5e7eb; }
         .right { text-align: right; }
         .totals { width: 45%; margin-left: 55%; margin-top: 15px; border-collapse: collapse; }
         .totals td { padding: 5px 8px; }
-        .totals .grand { font-size: 15px; font-weight: bold; border-top: 2px solid #1f2937; }
+        .totals .grand { font-size: 15px; font-weight: bold; border-top: 2px solid {{ $company->brandAccent() }}; }
         .totals .due { font-weight: bold; color: #b91c1c; }
         .notes { margin-top: 25px; font-size: 11px; }
         .footer { margin-top: 30px; font-size: 10px; text-align: center; color: #9ca3af; }
@@ -29,11 +33,10 @@
     </style>
 </head>
 <body>
-    @php($company = $invoice->company)
-    @php($cls = ['paid'=>'b-paid','partial'=>'b-partial','unpaid'=>'b-unpaid'][$invoice->status] ?? 'b-unpaid')
     <table class="header">
         <tr>
             <td style="width:55%;">
+                @if($logo)<img src="{{ $logo }}" class="logo" alt="">@endif
                 <div class="brand">{{ $company->name }}</div>
                 <div class="muted">
                     {{ $company->address }}<br>

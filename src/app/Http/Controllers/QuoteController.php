@@ -7,6 +7,7 @@ use App\Mail\QuoteMail;
 use App\Models\CatalogItem;
 use App\Models\Client;
 use App\Models\Invoice;
+use App\Models\Product;
 use App\Models\Quote;
 use App\Services\QuoteConverter;
 use Illuminate\Http\RedirectResponse;
@@ -44,9 +45,10 @@ class QuoteController extends Controller
         ]);
 
         return view('quotes.create', [
-            'quote'   => $quote,
-            'clients' => Client::orderBy('name')->get(),
-            'catalog' => $this->catalogItems(),
+            'quote'    => $quote,
+            'clients'  => Client::orderBy('name')->get(),
+            'catalog'  => $this->catalogItems(),
+            'products' => $this->sellableProducts(),
         ]);
     }
 
@@ -85,9 +87,10 @@ class QuoteController extends Controller
         $quote->load('lines');
 
         return view('quotes.edit', [
-            'quote'   => $quote,
-            'clients' => Client::orderBy('name')->get(),
-            'catalog' => $this->catalogItems(),
+            'quote'    => $quote,
+            'clients'  => Client::orderBy('name')->get(),
+            'catalog'  => $this->catalogItems(),
+            'products' => $this->sellableProducts(),
         ]);
     }
 
@@ -97,6 +100,12 @@ class QuoteController extends Controller
         return Auth::user()->company?->hasModule('batiment')
             ? CatalogItem::orderBy('trade')->orderBy('label')->get()
             : collect();
+    }
+
+    /** Produits du stock proposables comme lignes de devis. */
+    private function sellableProducts()
+    {
+        return Product::sellable()->orderBy('category')->orderBy('name')->get();
     }
 
     public function update(Request $request, Quote $quote): RedirectResponse

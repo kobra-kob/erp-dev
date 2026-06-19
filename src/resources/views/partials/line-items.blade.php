@@ -12,6 +12,7 @@
     }
     $types = ['main_oeuvre' => "Main d'œuvre", 'materiel' => 'Matériel', 'deplacement' => 'Déplacement', 'autre' => 'Autre'];
     $catalog = $catalog ?? collect();
+    $products = $products ?? collect();
 @endphp
 
 @error('lines')<div class="alert alert-danger py-2">Ajoutez au moins une ligne de prestation.</div>@enderror
@@ -34,6 +35,26 @@
             @endforeach
         </select>
         <button type="button" class="btn btn-outline-primary" id="addFromCatalog"><i class="bi bi-plus-lg me-1"></i>Insérer</button>
+    </div>
+@endif
+
+@if($products->isNotEmpty())
+    <div class="input-group input-group-sm mb-2" style="max-width:560px;">
+        <span class="input-group-text"><i class="bi bi-box-seam me-1"></i>Produit</span>
+        <select id="productPicker" class="form-select">
+            <option value="">— Choisir un produit du stock… —</option>
+            @foreach($products->groupBy(fn ($p) => $p->category ?: 'Sans catégorie') as $cat => $group)
+                <optgroup label="{{ $cat }}">
+                    @foreach($group as $p)
+                        <option value="{{ $p->id }}"
+                                data-label="{{ $p->name }}{{ $p->reference ? ' ('.$p->reference.')' : '' }}"
+                                data-price="{{ $p->sale_price }}"
+                                data-tax="{{ $p->tax_rate }}">{{ $p->name }} — @eur($p->sale_price)</option>
+                    @endforeach
+                </optgroup>
+            @endforeach
+        </select>
+        <button type="button" class="btn btn-outline-primary" id="addFromProduct"><i class="bi bi-plus-lg me-1"></i>Insérer</button>
     </div>
 @endif
 
@@ -155,6 +176,23 @@
             if (!opt || !opt.value) return;
             addRow({
                 type: opt.dataset.type,
+                label: opt.dataset.label,
+                price: opt.dataset.price,
+                tax: opt.dataset.tax,
+            });
+            sel.value = '';
+        });
+    }
+
+    // Insertion d'un produit du stock (ligne « matériel »)
+    const productBtn = document.getElementById('addFromProduct');
+    if (productBtn) {
+        productBtn.addEventListener('click', function () {
+            const sel = document.getElementById('productPicker');
+            const opt = sel.selectedOptions[0];
+            if (!opt || !opt.value) return;
+            addRow({
+                type: 'materiel',
                 label: opt.dataset.label,
                 price: opt.dataset.price,
                 tax: opt.dataset.tax,

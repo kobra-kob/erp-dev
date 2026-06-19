@@ -11,7 +11,7 @@
 
     <h1 class="h3 fw-bold mb-4">Nouveau produit</h1>
 
-    <form method="POST" action="{{ route('products.store') }}">
+    <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
         @include('products._form')
         <div class="mt-3 d-flex gap-2">
             <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Enregistrer</button>

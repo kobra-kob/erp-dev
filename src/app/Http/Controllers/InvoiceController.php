@@ -7,6 +7,7 @@ use App\Mail\InvoiceMail;
 use App\Mail\InvoiceReminderMail;
 use App\Models\Client;
 use App\Models\Invoice;
+use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,8 +42,9 @@ class InvoiceController extends Controller
         ]);
 
         return view('invoices.create', [
-            'invoice' => $invoice,
-            'clients' => Client::orderBy('name')->get(),
+            'invoice'  => $invoice,
+            'clients'  => Client::orderBy('name')->get(),
+            'products' => $this->sellableProducts(),
         ]);
     }
 
@@ -81,9 +83,16 @@ class InvoiceController extends Controller
         $invoice->load('lines');
 
         return view('invoices.edit', [
-            'invoice' => $invoice,
-            'clients' => Client::orderBy('name')->get(),
+            'invoice'  => $invoice,
+            'clients'  => Client::orderBy('name')->get(),
+            'products' => $this->sellableProducts(),
         ]);
+    }
+
+    /** Produits du stock proposables comme lignes de facture. */
+    private function sellableProducts()
+    {
+        return Product::sellable()->orderBy('category')->orderBy('name')->get();
     }
 
     public function update(Request $request, Invoice $invoice): RedirectResponse

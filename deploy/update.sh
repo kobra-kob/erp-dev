@@ -58,6 +58,7 @@ composer install --no-dev --optimize-autoloader --no-interaction
 
 log "Migrations (additives — aucune perte de données)"
 php artisan migrate --force
+php artisan storage:link 2>/dev/null || true   # lien public/storage (idempotent)
 
 log "Régénération des caches"
 php artisan optimize:clear
@@ -68,6 +69,9 @@ php artisan event:cache
 log "Permissions (www-data)"
 chown -R www-data:www-data "$APP_DIR"
 chmod -R ug+rwX "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+
+log "Rechargement Apache (vide l'OPcache → nouveau code actif)"
+systemctl reload apache2 2>/dev/null || true
 
 log "Mode maintenance OFF"
 php artisan up

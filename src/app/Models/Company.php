@@ -6,15 +6,60 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'name', 'owner_id', 'siret', 'address', 'city', 'zip',
     'phone', 'email', 'logo', 'subscription',
+    'brand_color', 'brand_accent', 'document_shape',
 ])]
 class Company extends Model
 {
     /** Nombre maximum d'employés (en plus de l'owner) par entreprise. */
     public const MAX_EMPLOYEES = 5;
+
+    /** Formes disponibles pour les documents (devis/factures). */
+    public const SHAPES = [
+        'rounded' => 'Arrondie',
+        'square'  => 'Anguleuse',
+    ];
+
+    // --- Identité visuelle (logo + thème des documents) ---
+
+    public function brandColor(): string
+    {
+        return $this->brand_color ?: '#2563eb';
+    }
+
+    public function brandAccent(): string
+    {
+        return $this->brand_accent ?: '#1f2937';
+    }
+
+    /** Rayon des coins selon la forme choisie. */
+    public function documentRadius(): string
+    {
+        return $this->document_shape === 'square' ? '0' : '6px';
+    }
+
+    /** URL publique du logo (affichage web), ou null. */
+    public function logoUrl(): ?string
+    {
+        return $this->logo ? Storage::disk('public')->url($this->logo) : null;
+    }
+
+    /** Logo en data-URI base64 — fiable pour l'inclusion dans les PDF (DomPDF). */
+    public function logoDataUri(): ?string
+    {
+        if (! $this->logo || ! Storage::disk('public')->exists($this->logo)) {
+            return null;
+        }
+
+        $contents = Storage::disk('public')->get($this->logo);
+        $mime = Storage::disk('public')->mimeType($this->logo) ?: 'image/png';
+
+        return 'data:' . $mime . ';base64,' . base64_encode($contents);
+    }
 
     public function owner(): BelongsTo
     {

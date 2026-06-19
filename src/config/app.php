@@ -17,6 +17,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Version applicative
+    |--------------------------------------------------------------------------
+    | Affichée dans le menu utilisateur. Schéma : 1.<lot fonctionnel>.<correctif>.
+    | 1.6 = produits vendables (fiche, photo, insertion devis/factures).
+    | 1.7 = identité visuelle (logo + thème couleurs/forme des devis/factures).
+    */
+
+    'version' => env('APP_VERSION', '1.7.0'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

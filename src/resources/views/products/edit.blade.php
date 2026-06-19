@@ -11,7 +11,7 @@
 
     <h1 class="h3 fw-bold mb-4">Modifier {{ $product->name }}</h1>
 
-    <form method="POST" action="{{ route('products.update', $product) }}">
+    <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data">
         @method('PUT')
         @include('products._form')
         <div class="mt-3 d-flex gap-2">

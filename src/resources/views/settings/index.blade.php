@@ -113,6 +113,93 @@
         </div>
     </div>
 
+    {{-- Apparence des devis / factures (admin) --}}
+    @if($user->isAdmin())
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body p-4">
+                <h2 class="h6 text-uppercase text-muted mb-3">Apparence des devis &amp; factures</h2>
+
+                @error('brand_color')<div class="alert alert-danger py-2">{{ $message }}</div>@enderror
+                @error('logo')<div class="alert alert-danger py-2">{{ $message }}</div>@enderror
+
+                <form method="POST" action="{{ route('settings.branding.update') }}" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Logo de l'entreprise</label>
+                            <input type="file" name="logo" accept="image/*" class="form-control" id="logoInput">
+                            <div class="form-text">PNG/JPG, max 2 Mo. Apparaît en haut des documents.</div>
+                            <div class="mt-2">
+                                <img id="logoPreview" src="{{ $company->logoUrl() ?: '' }}" alt=""
+                                     class="border rounded bg-light p-1 {{ $company->logoUrl() ? '' : 'd-none' }}"
+                                     style="max-height:70px;max-width:180px;object-fit:contain;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Couleur principale</label>
+                            <input type="color" name="brand_color" id="brandColor"
+                                   value="{{ old('brand_color', $company->brandColor()) }}" class="form-control form-control-color" style="width:100%;">
+                            <label class="form-label mt-3">Couleur du bandeau</label>
+                            <input type="color" name="brand_accent" id="brandAccent"
+                                   value="{{ old('brand_accent', $company->brandAccent()) }}" class="form-control form-control-color" style="width:100%;">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Forme</label>
+                            <select name="document_shape" id="docShape" class="form-select">
+                                @foreach(\App\Models\Company::SHAPES as $val => $label)
+                                    <option value="{{ $val }}" @selected(old('document_shape', $company->document_shape ?? 'rounded') === $val)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Aperçu en direct --}}
+                        <div class="col-md-3">
+                            <label class="form-label">Aperçu</label>
+                            <div id="docPreview" class="border p-2" style="border-radius:{{ $company->documentRadius() }};">
+                                <div id="pvBrand" class="fw-bold" style="color:{{ $company->brandColor() }};">{{ $company->name }}</div>
+                                <div id="pvBand" class="text-white small px-2 py-1 mt-1"
+                                     style="background:{{ $company->brandAccent() }};border-radius:{{ $company->documentRadius() }};">Prestation — Total HT</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-check-lg me-1"></i>Enregistrer l'apparence</button>
+                </form>
+            </div>
+        </div>
+
+        @push('scripts')
+        <script>
+        (function () {
+            const color = document.getElementById('brandColor');
+            const accent = document.getElementById('brandAccent');
+            const shape = document.getElementById('docShape');
+            const pvBrand = document.getElementById('pvBrand');
+            const pvBand = document.getElementById('pvBand');
+            const pv = document.getElementById('docPreview');
+            const logoInput = document.getElementById('logoInput');
+            const logoPreview = document.getElementById('logoPreview');
+
+            function refresh() {
+                pvBrand.style.color = color.value;
+                pvBand.style.background = accent.value;
+                const r = shape.value === 'square' ? '0' : '6px';
+                pv.style.borderRadius = r;
+                pvBand.style.borderRadius = r;
+            }
+            [color, accent, shape].forEach(el => el.addEventListener('input', refresh));
+
+            logoInput.addEventListener('change', e => {
+                const f = e.target.files[0];
+                if (f) { logoPreview.src = URL.createObjectURL(f); logoPreview.classList.remove('d-none'); }
+            });
+        })();
+        </script>
+        @endpush
+    @endif
+
     {{-- Journal d'audit --}}
     <div class="card border-0 shadow-sm mt-4">
         <div class="card-body p-4">

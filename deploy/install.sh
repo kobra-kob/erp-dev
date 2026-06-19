@@ -57,6 +57,11 @@ apt-get install -y apache2 mariadb-server \
     "php${PHP_V}-cli" "php${PHP_V}-mysql" "php${PHP_V}-mbstring" "php${PHP_V}-xml" \
     "php${PHP_V}-curl" "php${PHP_V}-zip" "php${PHP_V}-gd" "php${PHP_V}-intl" "php${PHP_V}-bcmath"
 
+log "Réglages PHP de production (OPcache + JIT + cache de chemins)"
+if [ -f "$SCRIPT_DIR/php-production.ini" ]; then
+    cp "$SCRIPT_DIR/php-production.ini" "/etc/php/${PHP_V}/apache2/conf.d/99-artisanflow.ini"
+fi
+
 log "Composer"
 if ! command -v composer >/dev/null; then
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -103,11 +108,11 @@ DB_DATABASE=${DB_NAME}
 DB_USERNAME=${DB_USER}
 DB_PASSWORD=${DB_PASS}
 
-SESSION_DRIVER=database
+SESSION_DRIVER=file
 SESSION_LIFETIME=120
 SESSION_SECURE_COOKIE=false
-CACHE_STORE=database
-QUEUE_CONNECTION=database
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
 
 MAIL_MAILER=log
 MAIL_FROM_ADDRESS="no-reply@${APP_DOMAIN}"
@@ -121,6 +126,7 @@ ENV
 log "Clé applicative + migrations"
 php artisan key:generate --force
 php artisan migrate --force
+php artisan storage:link   # photos produits & pièces jointes publiques
 if [ "$SEED_DEMO" = "1" ]; then php artisan db:seed --force; fi
 
 log "Compte administrateur (propriétaire)"

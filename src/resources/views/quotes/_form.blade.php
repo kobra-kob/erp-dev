@@ -33,7 +33,7 @@
 <div class="card border-0 shadow-sm mb-3">
     <div class="card-body p-4">
         <h2 class="h6 fw-bold mb-3">Prestations</h2>
-        @include('partials.line-items', ['document' => $quote, 'catalog' => $catalog ?? collect()])
+        @include('partials.line-items', ['document' => $quote, 'catalog' => $catalog ?? collect(), 'products' => $products ?? collect()])
     </div>
 </div>
 
