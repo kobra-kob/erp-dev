@@ -25,3 +25,6 @@ src/bootstrap/cache/*.php
 .phpunit.result.cache
 .DS_Store
 Thumbs.db
+
+# Artefact psysh (chemin Windows mal résolu dans le conteneur)
+src/C:/

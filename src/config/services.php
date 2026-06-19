@@ -22,6 +22,11 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    // Brevo (ex-Sendinblue) — envoi via API HTTPS (port 443), contourne le blocage SMTP.
+    'brevo' => [
+        'key' => env('BREVO_API_KEY'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
