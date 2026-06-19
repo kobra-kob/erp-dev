@@ -18,6 +18,25 @@ class Company extends Model
     /** Nombre maximum d'employés (en plus de l'owner) par entreprise. */
     public const MAX_EMPLOYEES = 5;
 
+    protected static function booted(): void
+    {
+        // À la création d'une entreprise, on active par défaut tous les modules
+        // du socle (hors « settings » obligatoire). L'owner pourra en désactiver
+        // à l'inscription (onboarding) ou plus tard dans le catalogue.
+        static::created(function (self $company) {
+            foreach (array_keys(config('modules', [])) as $key) {
+                if (config("modules.$key.mandatory")) {
+                    continue;
+                }
+                $company->modules()->create([
+                    'module_key'   => $key,
+                    'active'       => true,
+                    'activated_at' => now(),
+                ]);
+            }
+        });
+    }
+
     /** Formes disponibles pour les documents (devis/factures). */
     public const SHAPES = [
         'rounded' => 'Arrondie',
@@ -99,6 +118,19 @@ class Company extends Model
     public function hasModule(string $key): bool
     {
         return $this->modules()->where('module_key', $key)->where('active', true)->exists();
+    }
+
+    /**
+     * Le module (socle OU vertical) est-il actif pour l'entreprise ?
+     * Les modules « obligatoires » (ex. Paramètres) le sont toujours.
+     */
+    public function isModuleEnabled(string $key): bool
+    {
+        if (config("modules.$key.mandatory")) {
+            return true;
+        }
+
+        return $this->hasModule($key);
     }
 
     public function enableModule(string $key): void

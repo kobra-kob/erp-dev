@@ -153,6 +153,7 @@ return [
         'route'       => 'settings.index',
         'available'   => true,
         'roles'       => ['ADMIN', 'GERANT', 'EMPLOYE'],
+        'mandatory'   => true, // toujours actif : on ne peut pas le désactiver
     ],
 
 ];

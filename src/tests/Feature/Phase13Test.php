@@ -36,7 +36,7 @@ class Phase13Test extends TestCase
         $this->post('/register', [
             'company_name' => 'Ma Boîte', 'name' => 'Jean', 'email' => 'jean@test.local',
             'password' => 'password123', 'password_confirmation' => 'password123',
-        ])->assertRedirect(route('dashboard'));
+        ])->assertRedirect(route('onboarding'));
 
         $user = User::where('email', 'jean@test.local')->firstOrFail();
         $this->assertSame($user->id, $user->company->owner_id);

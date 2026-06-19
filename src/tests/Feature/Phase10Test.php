@@ -130,7 +130,7 @@ class Phase10Test extends TestCase
         $this->post('/register', [
             'company_name' => 'Nouvelle', 'name' => 'Jean', 'email' => 'jean@test.local',
             'password' => 'password123', 'password_confirmation' => 'password123',
-        ])->assertRedirect(route('dashboard'));
+        ])->assertRedirect(route('onboarding'));
 
         Mail::assertSent(AccountWelcomeMail::class);
     }

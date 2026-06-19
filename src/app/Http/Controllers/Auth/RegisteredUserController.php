@@ -60,6 +60,7 @@ class RegisteredUserController extends Controller
         $request->session()->regenerate();
         LoginAudit::log('register', $user);
 
-        return redirect()->route('dashboard');
+        // Premier paramétrage : choix des modules à activer.
+        return redirect()->route('onboarding');
     }
 }

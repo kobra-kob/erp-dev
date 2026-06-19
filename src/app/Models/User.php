@@ -99,7 +99,18 @@ class User extends Authenticatable
 
     public function canAccessModule(string $key): bool
     {
-        if (in_array($key, self::ALWAYS_ALLOWED, true) || $this->isAdmin()) {
+        // Module obligatoire (Paramètres) : toujours accessible.
+        if (config("modules.$key.mandatory")) {
+            return true;
+        }
+
+        // Gate entreprise : le module (socle ou vertical) doit être activé.
+        if (! $this->company?->isModuleEnabled($key)) {
+            return false;
+        }
+
+        // Gate rôle.
+        if ($this->isAdmin() || in_array($key, self::ALWAYS_ALLOWED, true)) {
             return true;
         }
 

@@ -23,6 +23,7 @@ use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ModuleCatalogController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PublicQuoteController;
@@ -184,9 +185,13 @@ Route::middleware('auth')->group(function () {
         Route::get('employees/{employee}/documents/{document}/download', [EmployeeDocumentController::class, 'download'])->name('employees.documents.download');
         Route::delete('employees/{employee}/documents/{document}', [EmployeeDocumentController::class, 'destroy'])->name('employees.documents.destroy');
 
-        // Catalogue des modules optionnels (activation par l'entreprise)
+        // Catalogue des modules (socle + métiers) — activation par l'entreprise
         Route::get('modules', [ModuleCatalogController::class, 'index'])->name('modules.catalog');
         Route::post('modules/{key}/toggle', [ModuleCatalogController::class, 'toggle'])->name('modules.toggle');
+
+        // Choix des modules après inscription (onboarding)
+        Route::get('onboarding', [OnboardingController::class, 'show'])->name('onboarding');
+        Route::post('onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
     });
 
     // Module Bâtiment : catalogue de prestations (si le module est activé)

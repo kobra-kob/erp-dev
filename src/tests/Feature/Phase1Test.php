@@ -35,7 +35,7 @@ class Phase1Test extends TestCase
             'password_confirmation' => 'password123',
         ]);
 
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('onboarding')); // inscription → choix des modules
         $this->assertAuthenticated();
 
         $user = User::where('email', 'jean@test.local')->first();

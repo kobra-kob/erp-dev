@@ -22,9 +22,10 @@ return [
     | Affichée dans le menu utilisateur. Schéma : 1.<lot fonctionnel>.<correctif>.
     | 1.6 = produits vendables (fiche, photo, insertion devis/factures).
     | 1.7 = identité visuelle (logo + thème couleurs/forme des devis/factures).
+    | 1.8 = modules activables à la carte (socle + métiers) + onboarding à l'inscription.
     */
 
-    'version' => env('APP_VERSION', '1.7.0'),
+    'version' => env('APP_VERSION', '1.8.0'),
 
     /*
     |--------------------------------------------------------------------------
