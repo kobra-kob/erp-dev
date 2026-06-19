@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }} — @yield('title', 'Tableau de bord')</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root { --af-primary: #2563eb; }
         body { background: #f1f5f9; }
-        .navbar-brand .brand-mark {
-            width: 34px; height: 34px; border-radius: 9px;
-            background: linear-gradient(135deg, #2563eb, #06b6d4);
-            display: inline-flex; align-items: center; justify-content: center; color: #fff;
-        }
+        .navbar-brand .brand-mark { width: 34px; height: 34px; display: inline-block; }
         .af-shell { max-width: 1200px; }
         /* Menu utilisateur : défile si plus haut que l'écran */
         .app-menu {
@@ -37,7 +34,7 @@
     <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
         <div class="container af-shell">
             <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ route('dashboard') }}">
-                <span class="brand-mark"><i class="bi bi-wrench-adjustable-circle-fill"></i></span>
+                <img src="{{ asset('favicon.svg') }}" alt="" class="brand-mark">
                 {{ config('app.name') }}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
