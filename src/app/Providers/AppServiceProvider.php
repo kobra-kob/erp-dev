@@ -4,11 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
-use Symfony\Component\Mailer\Transport\Dsn;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,14 +29,6 @@ class AppServiceProvider extends ServiceProvider
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
-
-        // Transport Brevo (envoi via API HTTPS, port 443) — contourne le blocage
-        // SMTP des FAI/pfSense. Activé en mettant MAIL_MAILER=brevo + BREVO_API_KEY.
-        Mail::extend('brevo', function () {
-            return (new BrevoTransportFactory())->create(
-                new Dsn('brevo+api', 'default', config('services.brevo.key'))
-            );
-        });
 
         // Pagination rendue avec le thème Bootstrap 5.
         Paginator::useBootstrapFive();

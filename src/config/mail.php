@@ -65,11 +65,6 @@ return [
             'transport' => 'resend',
         ],
 
-        // Brevo via API HTTPS (transport enregistré dans AppServiceProvider).
-        'brevo' => [
-            'transport' => 'brevo',
-        ],
-
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),

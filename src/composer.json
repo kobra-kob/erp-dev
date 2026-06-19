@@ -11,7 +11,6 @@
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
         "pragmarx/google2fa": "^9.0",
-        "symfony/brevo-mailer": "^8.1",
         "symfony/http-client": "^8.1"
     },
     "require-dev": {
