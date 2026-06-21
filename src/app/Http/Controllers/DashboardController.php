@@ -98,8 +98,8 @@ class DashboardController extends Controller
             ->filter(fn ($m, $key) => ($m['available'] ?? false) && ($m['route'] ?? null) && $company?->hasModule($key))
             ->map(fn ($m, $key) => [
                 'key'         => $key,
-                'label'       => $m['label'],
-                'description' => $m['feature'] ?? $m['description'],
+                'label'       => $m['feature'] ?? $m['label'],
+                'description' => $m['label'],
                 'icon'        => $m['icon'],
                 'color'       => $m['color'],
                 'route'       => $m['route'],

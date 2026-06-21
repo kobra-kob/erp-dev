@@ -4,18 +4,24 @@
 @push('head')
 <style>
     .kpi-card { border: none; border-radius: .9rem; box-shadow: 0 2px 10px rgba(15,23,42,.05); }
-    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1.25rem; }
     .module-card {
-        position: relative; border: 1px solid #e2e8f0; border-radius: 1rem; background: #fff;
-        padding: 1.25rem; text-decoration: none; color: inherit; display: block;
+        position: relative; border: none; border-radius: 1rem; color: #fff;
+        text-decoration: none; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; text-align: center;
+        min-height: 140px; padding: 1.5rem 1rem; cursor: pointer;
+        background-image: linear-gradient(135deg, rgba(255,255,255,.16), rgba(0,0,0,.14));
         transition: transform .12s ease, box-shadow .12s ease;
     }
-    .module-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(15,23,42,.10); }
+    .module-card:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(15,23,42,.20); }
+    .module-card .m-ico { font-size: 2.1rem; line-height: 1; margin-bottom: .65rem; }
+    .module-card .m-label { font-weight: 600; font-size: 1.1rem; }
+    /* Pastille d'icône des KPIs (en-tête) */
     .module-icon {
         width: 52px; height: 52px; border-radius: 13px; display: inline-flex;
         align-items: center; justify-content: center; color: #fff; font-size: 1.5rem; margin-bottom: .75rem;
     }
-    .module-card.is-soon { opacity: .6; }
+    .module-card.is-soon { opacity: .55; }
     .module-card .badge-soon { position: absolute; top: .6rem; right: .6rem; }
     .module-tools { position: absolute; top: .5rem; right: .5rem; display: none; gap: .25rem; }
     body.editing .module-tools { display: flex; }
@@ -87,6 +93,7 @@
         @foreach($modules as $m)
             <div class="module-card {{ $m['available'] ? '' : 'is-soon' }} {{ $m['is_hidden'] ? 'is-hidden' : '' }} {{ $m['is_favorite'] ? 'is-favorite' : '' }}"
                  data-key="{{ $m['key'] }}"
+                 style="background-color: {{ $m['color'] }}"
                  @if($m['available'] && $m['route']) data-href="{{ route($m['route']) }}" @endif>
 
                 <div class="module-tools">
@@ -98,12 +105,11 @@
                     </button>
                 </div>
 
-                @if(!$m['available'])<span class="badge text-bg-secondary badge-soon">bientôt</span>@endif
-                @if($m['is_favorite'])<i class="bi bi-star-fill text-warning position-absolute" style="top:.7rem;left:.7rem;"></i>@endif
+                @if(!$m['available'])<span class="badge text-bg-light text-dark badge-soon">bientôt</span>@endif
+                @if($m['is_favorite'])<i class="bi bi-star-fill position-absolute" style="top:.7rem;left:.7rem;color:#fde047;"></i>@endif
 
-                <div class="module-icon" style="background: {{ $m['color'] }}"><i class="bi {{ $m['icon'] }}"></i></div>
-                <div class="fw-semibold">{{ $m['label'] }}</div>
-                <div class="text-muted small">{{ $m['description'] }}</div>
+                <div class="m-ico"><i class="bi {{ $m['icon'] }}"></i></div>
+                <div class="m-label">{{ $m['label'] }}</div>
             </div>
         @endforeach
     </div>
