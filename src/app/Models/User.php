@@ -72,6 +72,18 @@ class User extends Authenticatable
         return $this->role === self::ROLE_ADMIN;
     }
 
+    /** Propriétaire (owner) de l'entreprise. */
+    public function isOwner(): bool
+    {
+        return $this->company !== null && $this->id === $this->company->owner_id;
+    }
+
+    /** Peut consulter les infos du tenant (nom + ID support). */
+    public function canViewTenantInfo(): bool
+    {
+        return $this->isAdmin() || $this->isOwner();
+    }
+
     // --- Accès par module (rôles intégrés ou personnalisés) ---
 
     /**

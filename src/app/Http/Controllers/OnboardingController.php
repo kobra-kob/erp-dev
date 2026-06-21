@@ -14,17 +14,18 @@ use Illuminate\View\View;
  */
 class OnboardingController extends Controller
 {
+    /** Modules pré-cochés par défaut à la création d'un tenant. */
+    public const DEFAULT_MODULES = ['clients', 'quotes', 'invoices'];
+
     public function show(Request $request): View
     {
-        $company = $request->user()->company;
-
         $core = collect(config('modules'))
             ->reject(fn ($m) => $m['mandatory'] ?? false)
-            ->map(fn ($m, $key) => $this->card($key, $m, 'Socle', true, $company->isModuleEnabled($key)));
+            ->map(fn ($m, $key) => $this->card($key, $m, 'Socle', true, in_array($key, self::DEFAULT_MODULES, true)));
 
         $sector = collect(config('sector_modules'))
             ->filter(fn ($m) => $m['available'] ?? false)
-            ->map(fn ($m, $key) => $this->card($key, $m, 'Métier', false, $company->hasModule($key)));
+            ->map(fn ($m, $key) => $this->card($key, $m, 'Métier', false, false));
 
         $modules = $core->values()->concat($sector->values())->groupBy('group');
 

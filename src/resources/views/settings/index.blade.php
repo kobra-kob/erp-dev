@@ -9,7 +9,19 @@
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <h2 class="h6 text-uppercase text-muted mb-3">Mon entreprise</h2>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <h2 class="h6 text-uppercase text-muted mb-0">Mon entreprise</h2>
+                        @if($user->canViewTenantInfo())
+                            <span class="d-inline-flex align-items-center gap-1 small text-muted">
+                                <span>ID support</span>
+                                <code class="bg-light px-2 py-1 rounded">{{ $company->supportId() }}</code>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-secondary" title="Copier"
+                                        onclick="navigator.clipboard.writeText('{{ $company->supportId() }}');this.innerHTML='&lt;i class=&quot;bi bi-check2&quot;&gt;&lt;/i&gt;'">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </span>
+                        @endif
+                    </div>
 
                     @error('name')<div class="alert alert-danger py-2">{{ $message }}</div>@enderror
 

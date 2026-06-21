@@ -78,6 +78,36 @@ class Phase18Test extends TestCase
         ])->assertRedirect(route('onboarding'));
     }
 
+    public function test_admin_sees_tenant_support_id_but_employee_does_not(): void
+    {
+        // L'admin (= owner ici) voit l'identifiant tenant dans les paramètres.
+        $this->get(route('settings.index'))->assertOk()
+            ->assertSee('ID support')
+            ->assertSee($this->company->supportId());
+
+        // Un employé n'y a pas accès (info masquée).
+        $employee = User::create([
+            'company_id' => $this->company->id, 'name' => 'Emp', 'email' => 'emp@test.local',
+            'password' => Hash::make('password'), 'role' => User::ROLE_EMPLOYE,
+        ]);
+
+        $this->actingAs($employee)->get(route('settings.index'))->assertOk()
+            ->assertDontSee($this->company->supportId());
+    }
+
+    public function test_onboarding_preselects_only_core_trio(): void
+    {
+        $html = $this->get(route('onboarding'))->assertOk()->getContent();
+
+        // Clients / Devis / Factures pré-cochés ; les autres non.
+        $this->assertStringContainsString('value="clients" checked', $html);
+        $this->assertStringContainsString('value="quotes" checked', $html);
+        $this->assertStringContainsString('value="invoices" checked', $html);
+        $this->assertStringContainsString('value="stock"', $html);
+        $this->assertStringNotContainsString('value="stock" checked', $html);
+        $this->assertStringNotContainsString('value="accounting" checked', $html);
+    }
+
     public function test_onboarding_applies_module_selection(): void
     {
         // On garde clients, on retire invoices, on active opticien.

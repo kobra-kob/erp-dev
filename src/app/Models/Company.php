@@ -80,6 +80,12 @@ class Company extends Model
         return 'data:' . $mime . ';base64,' . base64_encode($contents);
     }
 
+    /** Identifiant lisible du tenant, à communiquer au support (ex. AF-000012). */
+    public function supportId(): string
+    {
+        return 'AF-' . str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
+    }
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');

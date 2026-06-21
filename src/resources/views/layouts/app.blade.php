@@ -55,6 +55,9 @@
                     <ul class="dropdown-menu dropdown-menu-end shadow app-menu">
                         <li><span class="dropdown-item-text small text-muted">
                             {{ $u->company?->name }}
+                            @if($u->canViewTenantInfo())
+                                <span class="d-block text-secondary" style="font-size:.7rem;">ID : {{ $u->company?->supportId() }}</span>
+                            @endif
                             <span class="d-block text-secondary" style="font-size:.7rem;">ArtisanFlow v{{ config('app.version') }}</span>
                         </span></li>
                         <li><hr class="dropdown-divider"></li>
