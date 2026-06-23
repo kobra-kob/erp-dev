@@ -8,6 +8,7 @@ use App\Mail\InvoiceReminderMail;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Services\StockManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,11 +49,15 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, StockManager $stock): RedirectResponse
     {
         $data = $this->validateInvoice($request);
 
-        $invoice = DB::transaction(function () use ($data, $request) {
+        if ($errors = $this->stockErrors($request->input('lines', []))) {
+            return back()->withErrors($errors)->withInput();
+        }
+
+        $invoice = DB::transaction(function () use ($data, $request, $stock) {
             $invoice = Invoice::create([
                 'client_id'  => $data['client_id'],
                 'number'     => Invoice::nextNumber(Auth::user()->company_id),
@@ -64,6 +69,9 @@ class InvoiceController extends Controller
             ]);
 
             $this->syncLines($invoice, $request->input('lines', []));
+            // Décompte du stock à la facturation.
+            $stock->reconcile($invoice->company_id, [], $this->productQuantities($invoice->lines));
+            $invoice->update(['stock_applied_at' => now()]);
 
             return $invoice;
         });
@@ -95,11 +103,18 @@ class InvoiceController extends Controller
         return Product::sellable()->orderBy('category')->orderBy('name')->get();
     }
 
-    public function update(Request $request, Invoice $invoice): RedirectResponse
+    public function update(Request $request, Invoice $invoice, StockManager $stock): RedirectResponse
     {
         $data = $this->validateInvoice($request);
 
-        DB::transaction(function () use ($invoice, $data, $request) {
+        // Quantités déjà décomptées par CETTE facture (rendues lors du recalcul).
+        $old = $this->productQuantities($invoice->lines()->get());
+
+        if ($errors = $this->stockErrors($request->input('lines', []), $old)) {
+            return back()->withErrors($errors)->withInput();
+        }
+
+        DB::transaction(function () use ($invoice, $data, $request, $stock, $old) {
             $invoice->update([
                 'client_id'  => $data['client_id'],
                 'title'      => $data['title'] ?? null,
@@ -109,14 +124,19 @@ class InvoiceController extends Controller
             ]);
 
             $this->syncLines($invoice, $request->input('lines', []));
+            // Réconcilie le stock : variation nette entre ancien et nouveau.
+            $stock->reconcile($invoice->company_id, $old, $this->productQuantities($invoice->lines));
+            $invoice->update(['stock_applied_at' => now()]);
             $invoice->refreshPaymentStatus(); // le total a pu changer
         });
 
         return redirect()->route('invoices.show', $invoice)->with('status', 'Facture mise à jour.');
     }
 
-    public function destroy(Invoice $invoice): RedirectResponse
+    public function destroy(Invoice $invoice, StockManager $stock): RedirectResponse
     {
+        // Restitue au stock les produits facturés.
+        $stock->reconcile($invoice->company_id, $this->productQuantities($invoice->lines()->get()), []);
         $invoice->delete();
 
         return redirect()->route('invoices.index')->with('status', 'Facture supprimée.');

@@ -7,6 +7,7 @@
             ? $document->lines->map(fn ($l) => [
                 'type' => $l->type, 'description' => $l->description,
                 'quantity' => $l->quantity, 'unit_price' => $l->unit_price, 'tax_rate' => $l->tax_rate,
+                'product_id' => $l->product_id,
             ])->values()->all()
             : [];
     }
@@ -47,9 +48,11 @@
                 <optgroup label="{{ $cat }}">
                     @foreach($group as $p)
                         <option value="{{ $p->id }}"
+                                data-pid="{{ $p->id }}"
+                                data-stock="{{ $p->stock }}"
                                 data-label="{{ $p->name }}{{ $p->reference ? ' ('.$p->reference.')' : '' }}"
                                 data-price="{{ $p->sale_price }}"
-                                data-tax="{{ $p->tax_rate }}">{{ $p->name }} — @eur($p->sale_price)</option>
+                                data-tax="{{ $p->tax_rate }}">{{ $p->name }} — @eur($p->sale_price) ({{ rtrim(rtrim(number_format($p->stock,2,',',' '),'0'),',') }} {{ $p->unit }})</option>
                     @endforeach
                 </optgroup>
             @endforeach
@@ -81,7 +84,7 @@
                             @endforeach
                         </select>
                     </td>
-                    <td><input type="text" name="lines[{{ $i }}][description]" value="{{ $row['description'] ?? '' }}" class="form-control form-control-sm" required></td>
+                    <td><input type="hidden" name="lines[{{ $i }}][product_id]" value="{{ $row['product_id'] ?? '' }}" class="l-pid"><input type="text" name="lines[{{ $i }}][description]" value="{{ $row['description'] ?? '' }}" class="form-control form-control-sm" required></td>
                     <td><input type="number" step="0.01" min="0" name="lines[{{ $i }}][quantity]" value="{{ $row['quantity'] ?? 1 }}" class="form-control form-control-sm l-qty"></td>
                     <td><input type="number" step="0.01" min="0" name="lines[{{ $i }}][unit_price]" value="{{ $row['unit_price'] ?? 0 }}" class="form-control form-control-sm l-price"></td>
                     <td><input type="number" step="0.01" min="0" max="100" name="lines[{{ $i }}][tax_rate]" value="{{ $row['tax_rate'] ?? 20 }}" class="form-control form-control-sm l-tax"></td>
@@ -118,7 +121,7 @@
                 @foreach($types as $val => $label)<option value="{{ $val }}">{{ $label }}</option>@endforeach
             </select>
         </td>
-        <td><input type="text" name="lines[__I__][description]" class="form-control form-control-sm" required></td>
+        <td><input type="hidden" name="lines[__I__][product_id]" class="l-pid"><input type="text" name="lines[__I__][description]" class="form-control form-control-sm" required></td>
         <td><input type="number" step="0.01" min="0" name="lines[__I__][quantity]" value="1" class="form-control form-control-sm l-qty"></td>
         <td><input type="number" step="0.01" min="0" name="lines[__I__][unit_price]" value="0" class="form-control form-control-sm l-price"></td>
         <td><input type="number" step="0.01" min="0" max="100" name="lines[__I__][tax_rate]" value="20" class="form-control form-control-sm l-tax"></td>
@@ -161,6 +164,12 @@
             if (values.label) row.querySelector('input[type="text"]').value = values.label;
             if (values.price !== undefined) row.querySelector('.l-price').value = values.price;
             if (values.tax !== undefined)   row.querySelector('.l-tax').value = values.tax;
+            if (values.product_id) row.querySelector('.l-pid').value = values.product_id;
+            if (values.stock !== undefined) {
+                const q = row.querySelector('.l-qty');
+                q.max = values.stock;            // borne la quantité au stock dispo
+                q.title = 'Stock disponible : ' + values.stock;
+            }
         }
         recompute();
     }
@@ -196,6 +205,8 @@
                 label: opt.dataset.label,
                 price: opt.dataset.price,
                 tax: opt.dataset.tax,
+                product_id: opt.dataset.pid,
+                stock: opt.dataset.stock,
             });
             sel.value = '';
         });

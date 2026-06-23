@@ -8,11 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'quote_id', 'type', 'description', 'quantity', 'unit_price', 'tax_rate', 'position',
+    'quote_id', 'product_id', 'type', 'description', 'quantity', 'unit_price', 'tax_rate', 'position',
 ])]
 class QuoteLine extends Model
 {
     use DocumentLine;
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
 
     protected function casts(): array
     {

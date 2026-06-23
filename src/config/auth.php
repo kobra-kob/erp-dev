@@ -42,6 +42,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Console de support (super-admin) : provider et table dédiés.
+        'support' => [
+            'driver' => 'session',
+            'provider' => 'support_users',
+        ],
     ],
 
     /*
@@ -67,10 +73,10 @@ return [
             'model' => env('AUTH_MODEL', User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'support_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\SupportUser::class,
+        ],
     ],
 
     /*

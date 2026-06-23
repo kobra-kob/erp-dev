@@ -25,6 +25,37 @@ services:
     networks:
       - artisanflow
 
+  # Console de support : MÊME image que `app`, mais APP_ROLE=support → ne sert
+  # que les routes de la console (routes/support.php), sur la même base de données.
+  support:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: artisanflow_support
+    restart: unless-stopped
+    working_dir: /var/www/html
+    environment:
+      APP_ROLE: support
+      AUTH_GUARD: support
+      # Cookie distinct → la session support ne percute pas celle des tenants.
+      SESSION_COOKIE: artisanflow-support-session
+      # Allowlist IP (vide en dev = ouvert). Ex. "172.18.0.*,90.12.34.56"
+      SUPPORT_ALLOWED_IPS: "${SUPPORT_ALLOWED_IPS:-}"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/zz-custom.ini:ro
+      - vendor:/var/www/html/vendor
+      # Volumes dédiés : pas de cache de config/route partagé avec le conteneur app.
+      - framework_support:/var/www/html/storage/framework
+      - bootstrap_cache_support:/var/www/html/bootstrap/cache
+    ports:
+      - "${SUPPORT_PORT:-8085}:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - artisanflow
+
   db:
     image: mariadb:11
     container_name: artisanflow_db
@@ -66,6 +97,8 @@ volumes:
   vendor:
   framework:
   bootstrap_cache:
+  framework_support:
+  bootstrap_cache_support:
 
 networks:
   artisanflow:

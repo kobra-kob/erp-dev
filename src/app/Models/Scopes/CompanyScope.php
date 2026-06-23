@@ -18,8 +18,13 @@ class CompanyScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        if (Auth::check() && ($companyId = Auth::user()->company_id)) {
-            $builder->where($model->getTable() . '.company_id', $companyId);
+        // On se base explicitement sur le guard « web » (les tenants) : ainsi la
+        // console de support (guard « support », sans company_id) n'applique aucun
+        // filtre et voit toutes les entreprises.
+        $user = Auth::guard('web')->user();
+
+        if ($user && $user->company_id) {
+            $builder->where($model->getTable() . '.company_id', $user->company_id);
         }
     }
 }

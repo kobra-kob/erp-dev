@@ -56,6 +56,10 @@ class QuoteController extends Controller
     {
         $data = $this->validateQuote($request);
 
+        if ($errors = $this->stockErrors($request->input('lines', []))) {
+            return back()->withErrors($errors)->withInput();
+        }
+
         $quote = DB::transaction(function () use ($data, $request) {
             $quote = Quote::create([
                 'client_id'   => $data['client_id'],
@@ -111,6 +115,10 @@ class QuoteController extends Controller
     public function update(Request $request, Quote $quote): RedirectResponse
     {
         $data = $this->validateQuote($request);
+
+        if ($errors = $this->stockErrors($request->input('lines', []))) {
+            return back()->withErrors($errors)->withInput();
+        }
 
         DB::transaction(function () use ($quote, $data, $request) {
             $quote->update([

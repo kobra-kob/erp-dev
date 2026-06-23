@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\Quote;
+use App\Services\StockManager;
 use Illuminate\Support\Facades\DB;
+
 
 /**
  * Transforme un devis accepté en facture. Idempotent : si une facture existe
@@ -37,12 +39,22 @@ class QuoteConverter
 
             foreach ($quote->lines as $line) {
                 $invoice->lines()->create($line->only([
-                    'type', 'description', 'quantity', 'unit_price', 'tax_rate', 'position',
+                    'product_id', 'type', 'description', 'quantity', 'unit_price', 'tax_rate', 'position',
                 ]));
             }
 
             $invoice->load('lines');
             $invoice->recalculateTotals();
+
+            // La facture issue du devis décompte le stock (le devis ne l'avait pas fait).
+            $consumed = [];
+            foreach ($invoice->lines as $l) {
+                if ($l->product_id) {
+                    $consumed[$l->product_id] = ($consumed[$l->product_id] ?? 0) + (float) $l->quantity;
+                }
+            }
+            (new StockManager())->reconcile($invoice->company_id, [], $consumed);
+            $invoice->update(['stock_applied_at' => now()]);
 
             return $invoice;
         });

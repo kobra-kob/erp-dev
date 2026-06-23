@@ -17,15 +17,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Rôle du conteneur
+    |--------------------------------------------------------------------------
+    | « tenant »  : application ERP servie aux entreprises (routes web.php).
+    | « support » : console d'administration multi-tenant (routes support.php).
+    | Permet de servir les deux à partir de la même image Docker, sans dupliquer
+    | le code : seul le jeu de routes chargé change (voir bootstrap/app.php).
+    */
+
+    'role' => env('APP_ROLE', 'tenant'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Version applicative
     |--------------------------------------------------------------------------
     | Affichée dans le menu utilisateur. Schéma : 1.<lot fonctionnel>.<correctif>.
     | 1.6 = produits vendables (fiche, photo, insertion devis/factures).
     | 1.7 = identité visuelle (logo + thème couleurs/forme des devis/factures).
     | 1.8 = modules activables à la carte (socle + métiers) + onboarding à l'inscription.
+    | 1.9 = stock relié à la facturation (décompte à la facture, contrôle de disponibilité).
     */
 
-    'version' => env('APP_VERSION', '1.8.0'),
+    'version' => env('APP_VERSION', '1.9.0'),
 
     /*
     |--------------------------------------------------------------------------

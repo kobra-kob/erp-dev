@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'company_id', 'client_id', 'quote_id', 'number', 'status', 'title',
     'issue_date', 'due_date', 'notes',
     'subtotal_ht', 'tax_amount', 'total_ttc', 'paid_amount',
-    'reminders_sent', 'last_reminder_at', 'sent_at',
+    'reminders_sent', 'last_reminder_at', 'sent_at', 'stock_applied_at',
 ])]
 class Invoice extends Model
 {
@@ -39,6 +39,7 @@ class Invoice extends Model
             'paid_amount' => 'decimal:2',
             'last_reminder_at' => 'datetime',
             'sent_at'          => 'datetime',
+            'stock_applied_at' => 'datetime',
         ];
     }
 

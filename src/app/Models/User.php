@@ -40,6 +40,7 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
             'module_preferences'      => 'array',
             'is_active'               => 'boolean',
+            'last_seen_at'            => 'datetime',
         ];
     }
 
